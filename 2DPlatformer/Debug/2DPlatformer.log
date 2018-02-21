@@ -1,8 +1,5 @@
-﻿  Skipping... (no relevant changes detected)
-  stdafx.cpp
-  Player.cpp
-c:\users\auste\source\repos\2dplatformer\2dplatformer\player.cpp(93): warning C4018: '<': signed/unsigned mismatch
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  2DPlatformer.cpp
-  2DPlatformer.vcxproj -> C:\Users\auste\source\repos\2DPlatformer\Debug\2DPlatformer.exe
+﻿  Player.cpp
+c:\users\auste\source\repos\2dplatformer\2d-platformer\2dplatformer\player.cpp(101): warning C4018: '<': signed/unsigned mismatch
+c:\users\auste\source\repos\2dplatformer\2d-platformer\2dplatformer\player.cpp(141): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\auste\source\repos\2dplatformer\2d-platformer\2dplatformer\player.cpp(150): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  2DPlatformer.vcxproj -> C:\Users\auste\source\repos\2DPlatformer\2D-Platformer\Debug\2DPlatformer.exe
