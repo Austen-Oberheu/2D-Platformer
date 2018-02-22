@@ -91,7 +91,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Fl
 		}
 	}
 
-	if (falling == true and velocity.y < maxVerticalVelocity)
+	if (falling == true && velocity.y < maxVerticalVelocity)
 	{
 		velocity.y += 50;
 	}
@@ -128,9 +128,21 @@ sf::Sprite Player::playerSpriteUpdate(sf::Sprite &playerSprite, std::vector<sf::
 
 	if ((time / deltaTime) > 10) 
 	{
-		if (walking == true)
+		
+		if (jumping == true)
 		{
-			
+			playerSprite.setTexture(jumpingAnimation[frame]);
+			frame += 1;
+			if (frame == 9)
+				frame = 8;
+			time = 0.f;
+			playerSprite.setTextureRect(sf::IntRect(origin.x, origin.y, jumpingAnimation[frame].getSize().x, jumpingAnimation[frame].getSize().y));
+			if (walkingRight == false)
+				playerSprite.setTextureRect(sf::IntRect(playerSprite.getTextureRect().width, 0, -playerSprite.getTextureRect().width, playerSprite.getTextureRect().height));
+		}
+		else if (walking == true)
+		{
+
 			playerSprite.setTexture(walkingAnimation[frame]);
 			frame += 1;
 			if (frame == 9)
@@ -139,15 +151,6 @@ sf::Sprite Player::playerSpriteUpdate(sf::Sprite &playerSprite, std::vector<sf::
 			playerSprite.setTextureRect(sf::IntRect(origin.x, origin.y, walkingAnimation[frame].getSize().x, walkingAnimation[frame].getSize().y));
 			if (walkingRight == false)
 				playerSprite.setTextureRect(sf::IntRect(playerSprite.getTextureRect().width, 0, -playerSprite.getTextureRect().width, playerSprite.getTextureRect().height));
-		}
-		else if (jumping == true)
-		{
-			playerSprite.setTexture(jumpingAnimation[frame]);
-			frame += 1;
-			if (frame == 9)
-				frame = 0;
-			time = 0.f;
-			playerSprite.setTextureRect(sf::IntRect(origin.x, origin.y, jumpingAnimation[frame].getSize().x, jumpingAnimation[frame].getSize().y));
 		}
 		else
 		{
