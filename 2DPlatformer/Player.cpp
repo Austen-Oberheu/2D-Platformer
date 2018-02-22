@@ -6,7 +6,7 @@ Player::Player(sf::Sprite &playerShape)
 {
 	playerShape.setPosition(25, 300);
 	playerShape.setScale(.2f, .2f);
-	
+
 	velocity.x = 0; 
 	velocity.y = 0;
 	lastPosition.x = playerShape.getPosition().x;
@@ -16,7 +16,7 @@ Player::Player(sf::Sprite &playerShape)
 	maxVerticalVelocity = 1000;
 	minVerticalVelocity = -1500;
 	allowedToJump = false;
-	
+	walkingRight = true;
 	time = 0.f;
 
 }
@@ -26,24 +26,23 @@ Player::~Player()
 {
 }
 
-void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::FloatRect>& blockBoundingBox)
+void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::FloatRect>& blockBoundingBox, sf::Vector2f origin)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		
-		playerShape.setScale(.2f, .2f);
 		if (velocity.x < maxHorizontalVelocity)
 		{
 			velocity.x += 50;
 			std::cout << velocity.x << std::endl;
 		}
 		walking = true;
-
+		walkingRight = true;
+		
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 		
-		playerShape.setScale(-.2f, .2f);
+		//playerShape.scale(-1.f, 1.f);
 
 		if (velocity.x > minHorizontalVelocity)
 		{
@@ -51,6 +50,8 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Fl
 			
 		}
 		walking = true;
+		walkingRight = false;
+		
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
@@ -90,7 +91,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Fl
 		}
 	}
 
-	if (falling == true)
+	if (falling == true and velocity.y < maxVerticalVelocity)
 	{
 		velocity.y += 50;
 	}
@@ -101,12 +102,11 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Fl
 	for (int i = 0; i < blockBoundingBox.size(); i++)
 	{
 		if (playerBoundingBox.intersects(blockBoundingBox[i]))
-		{
-			
-			
+		{		
 			if (velocity.y > 0 && allowedToJump == false /*|| velocity.y < 0*/)
 			{
 				falling = false;
+				jumping = false;
 				allowedToJump = true;
 				velocity.y = 0;
 				playerShape.setPosition(playerShape.getPosition().x, lastPosition.y);
@@ -118,12 +118,11 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Fl
 	//std::cout << "x: " << velocity.x << " y: " << velocity.y << std::endl;
 	//lastPosition.x = playerShape.getPosition().x;
 	lastPosition.y = playerShape.getPosition().y;
-
 	playerShape.move(velocity.x * deltaTime, velocity.y * deltaTime);
 
 }
 
-sf::Sprite Player::playerSpriteUpdate(sf::Sprite &playerSprite, std::vector<sf::Texture>& idleAnimation, std::vector<sf::Texture>& walkingAnimation, float deltaTime, sf::Vector2f origin)
+sf::Sprite Player::playerSpriteUpdate(sf::Sprite &playerSprite, std::vector<sf::Texture>& idleAnimation, std::vector<sf::Texture>& walkingAnimation, std::vector <sf::Texture> &jumpingAnimation, float deltaTime, sf::Vector2f origin)
 {
 	time += deltaTime;
 
@@ -137,8 +136,18 @@ sf::Sprite Player::playerSpriteUpdate(sf::Sprite &playerSprite, std::vector<sf::
 			if (frame == 9)
 				frame = 0;
 			time = 0.f;
-			
 			playerSprite.setTextureRect(sf::IntRect(origin.x, origin.y, walkingAnimation[frame].getSize().x, walkingAnimation[frame].getSize().y));
+			if (walkingRight == false)
+				playerSprite.setTextureRect(sf::IntRect(playerSprite.getTextureRect().width, 0, -playerSprite.getTextureRect().width, playerSprite.getTextureRect().height));
+		}
+		else if (jumping == true)
+		{
+			playerSprite.setTexture(jumpingAnimation[frame]);
+			frame += 1;
+			if (frame == 9)
+				frame = 0;
+			time = 0.f;
+			playerSprite.setTextureRect(sf::IntRect(origin.x, origin.y, jumpingAnimation[frame].getSize().x, jumpingAnimation[frame].getSize().y));
 		}
 		else
 		{
@@ -147,14 +156,19 @@ sf::Sprite Player::playerSpriteUpdate(sf::Sprite &playerSprite, std::vector<sf::
 			if (frame == 9)
 				frame = 0;
 			time = 0.f;
+
 			playerSprite.setTextureRect(sf::IntRect(origin.x, origin.y, idleAnimation[frame].getSize().x, idleAnimation[frame].getSize().y));
+			if (walkingRight == false)
+			{
+				playerSprite.setTextureRect(sf::IntRect(playerSprite.getTextureRect().width, 0, -playerSprite.getTextureRect().width, playerSprite.getTextureRect().height));
+			}
 		}
 		
 	}
 	return playerSprite;
 }
 
-void Player::textureInit(std::vector<sf::Texture> &idleAnimation, std::vector <sf::Texture> &walkingAnimation)
+void Player::textureInit(std::vector<sf::Texture> &idleAnimation, std::vector <sf::Texture> &walkingAnimation, std::vector <sf::Texture> &jumpingAnimation)
 {
 	idleAnimation[0].loadFromFile("Textures/Idle__000.png");
 	idleAnimation[1].loadFromFile("Textures/Idle__001.png");
@@ -177,4 +191,15 @@ void Player::textureInit(std::vector<sf::Texture> &idleAnimation, std::vector <s
 	walkingAnimation[7].loadFromFile("Textures/Run__007.png");
 	walkingAnimation[8].loadFromFile("Textures/Run__008.png");
 	walkingAnimation[9].loadFromFile("Textures/Run__009.png");
+
+	jumpingAnimation[0].loadFromFile("Textures/Jump__000.png");
+	jumpingAnimation[1].loadFromFile("Textures/Jump__001.png");
+	jumpingAnimation[2].loadFromFile("Textures/Jump__002.png");
+	jumpingAnimation[3].loadFromFile("Textures/Jump__003.png");
+	jumpingAnimation[4].loadFromFile("Textures/Jump__004.png");
+	jumpingAnimation[5].loadFromFile("Textures/Jump__005.png");
+	jumpingAnimation[6].loadFromFile("Textures/Jump__006.png");
+	jumpingAnimation[7].loadFromFile("Textures/Jump__007.png");
+	jumpingAnimation[8].loadFromFile("Textures/Jump__008.png");
+	jumpingAnimation[9].loadFromFile("Textures/Jump__009.png");
 }
