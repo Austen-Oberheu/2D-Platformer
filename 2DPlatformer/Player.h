@@ -10,7 +10,7 @@ public:
 	Player(sf::Sprite &playerShape);
 	~Player();
 
-	void Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::RectangleShape> &blockBoundingBox, sf::Vector2f origin);
+	void Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::RectangleShape> &blockBoundingBox, sf::Vector2f origin, sf::Vertex ($bottomLine)[3][2], sf::Vertex($rightLine)[3][2], sf::Vertex($leftLine)[3][2], bool &jumpVariable);
 
 	sf::Sprite playerSpriteUpdate(sf::Sprite &playerSprite, std::vector<sf::Texture> &spriteTexture, std::vector<sf::Texture>& walkingAnimation, std::vector <sf::Texture> &jumpingAnimation, float deltaTime, sf::Vector2f origin);
 

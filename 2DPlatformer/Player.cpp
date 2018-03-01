@@ -15,6 +15,9 @@ Player::Player(sf::Sprite &playerShape)
 	minHorizontalVelocity = -500;
 	maxVerticalVelocity = 1000;
 	minVerticalVelocity = -1500;
+
+
+	
 	allowedToJump = false;
 	walkingRight = true;
 	time = 0.f;
@@ -26,9 +29,9 @@ Player::~Player()
 {
 }
 
-void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::RectangleShape>& blockBoundingBox, sf::Vector2f origin)
+void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::RectangleShape>& blockBoundingBox, sf::Vector2f origin, sf::Vertex ($bottomLine)[3][2], sf::Vertex ($rightLine)[3][2], sf::Vertex ($leftLine)[3][2], bool &jumpVariable)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && !sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 		if (velocity.x < maxHorizontalVelocity)
 		{
@@ -38,7 +41,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Re
 		walkingRight = true;
 		
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && !sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
 		if (velocity.x > minHorizontalVelocity)
 		{
@@ -61,7 +64,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Re
 		}
 	}
 	
-	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	/*if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
 		if (falling == false && velocity.y >= minHorizontalVelocity || jumping == false)
 		{
@@ -73,50 +76,113 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Re
 			allowedToJump = false;
 			falling = true;
 		}
-	}
+	}*/
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::A) && (!sf::Keyboard::isKeyPressed(sf::Keyboard::D)))
 	{
 		walking = false;
 		if (velocity.x < 0)
 		{
-			velocity.x += 25;
+			velocity.x += 50;
 		}
 		if (velocity.x > 0)
 		{
-			velocity.x -= 25;
+			velocity.x -= 50;
 		}
 	}
 
 	
 	sf::FloatRect playerBoundingBox = playerShape.getGlobalBounds();
 	std::vector<sf::RectangleShape> collidedTiles;
+
+	sf::Vector2f bottomPoint[3];
+	sf::Vector2f rightPoint[3];
+	sf::Vector2f leftPoint[3];
+	for (int i = 0; i < 3;)
+	{
+		bottomPoint[i] = $bottomLine[i][1].position;
+		rightPoint[i] = $rightLine[i][1].position;
+		leftPoint[i] = $leftLine[i][1].position;
+		i++;
+	}
 	
 	for (int i = 0; i < blockBoundingBox.size(); i++)
 	{
-		if (playerBoundingBox.intersects(blockBoundingBox[i].getGlobalBounds()))
+		
+		
+
+		bool bottomCollision = false;
+
+		for (int y = 0; y < 3;)
 		{
-			//collidedTiles.push_back(blockBoundingBox[i]);
-			if (playerShape.getPosition().x - blockBoundingBox[i].getPosition().x  < playerShape.getPosition().y - blockBoundingBox[i].getPosition().y)
+			if (blockBoundingBox[i].getGlobalBounds().contains(bottomPoint[y]))
 			{
-				//playerShape.setPosition(blockBoundingBox[i].getPosition().x - playerShape.getOrigin().x, playerShape.getPosition().y);
-				velocity.x = 0;
-			}
-			if (playerShape.getPosition().y - blockBoundingBox[i].getPosition().y < playerShape.getPosition().x - blockBoundingBox[i].getPosition().x)
-			{
-				//playerShape.setPosition(playerShape.getPosition().x, blockBoundingBox[i].getPosition().y - playerShape.getOrigin().y);
 				falling = false;
 				jumping = false;
 				allowedToJump = true;
 				velocity.y = 0;
-				playerShape.setPosition(playerShape.getPosition().x, lastPosition.y);
-				
+				playerShape.setPosition(playerShape.getPosition().x, lastPosition.y - .1f);
+				bottomCollision = true;
 			}
-			if (playerShape.getPosition().x - blockBoundingBox[i].getTextureRect().width < playerShape.getPosition().y - blockBoundingBox[i].getPosition().y)
+			y++;
+		}
+		if (bottomCollision == false)
+		{
+			for (int z = 0; z < 3;)
 			{
-				//playerShape.setPosition(blockBoundingBox[i].getTextureRect().width + playerShape.getOrigin().x, playerShape.getPosition().y);
-				velocity.x = 0;
+				if (!blockBoundingBox[i].getGlobalBounds().contains(bottomPoint[z]))
+				{
+					falling = true;
+				}
+				z++;
 			}
 		}
+
+		for (int y = 0; y < 3;)
+		{
+			if (blockBoundingBox[i].getGlobalBounds().contains(rightPoint[y]))
+			{
+				std::cout << "Hit Side" << std::endl;
+				velocity.x = 0;
+				playerShape.setPosition(lastPosition.x - 1, playerShape.getPosition().y);
+			}
+			y++;
+		}
+
+		for (int y = 0; y < 3;)
+		{
+			if (blockBoundingBox[i].getGlobalBounds().contains(leftPoint[y]))
+			{
+				std::cout << "Hit Side" << std::endl;
+				velocity.x = 0;
+				playerShape.setPosition(lastPosition.x + 1, playerShape.getPosition().y);
+			}
+			y++;
+		}
+		
+		//if (playerBoundingBox.intersects(blockBoundingBox[i].getGlobalBounds()))
+		//{
+		//	//collidedTiles.push_back(blockBoundingBox[i]);
+		//	if (playerShape.getPosition().x - blockBoundingBox[i].getPosition().x  < playerShape.getPosition().y - blockBoundingBox[i].getPosition().y)
+		//	{
+		//		//playerShape.setPosition(blockBoundingBox[i].getPosition().x - playerShape.getOrigin().x, playerShape.getPosition().y);
+		//		velocity.x = 0;
+		//	}
+		//	if (playerShape.getPosition().y - blockBoundingBox[i].getPosition().y < playerShape.getPosition().x - blockBoundingBox[i].getPosition().x)
+		//	{
+		//		//playerShape.setPosition(playerShape.getPosition().x, blockBoundingBox[i].getPosition().y - playerShape.getOrigin().y);
+		//		falling = false;
+		//		jumping = false;
+		//		allowedToJump = true;
+		//		velocity.y = 0;
+		//		playerShape.setPosition(playerShape.getPosition().x, lastPosition.y);
+		//		
+		//	}
+		//	if (playerShape.getPosition().x - blockBoundingBox[i].getTextureRect().width < playerShape.getPosition().y - blockBoundingBox[i].getPosition().y)
+		//	{
+		//		//playerShape.setPosition(blockBoundingBox[i].getTextureRect().width + playerShape.getOrigin().x, playerShape.getPosition().y);
+		//		velocity.x = 0;
+		//	}
+		//}
 	}
 
 
@@ -158,6 +224,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Re
 		velocity.y += 50;
 	}
 
+	jumpVariable = allowedToJump;
 
 
 	playerShape.setOrigin(origin);
