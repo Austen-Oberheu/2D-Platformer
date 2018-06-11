@@ -7,10 +7,10 @@
 class Player
 {
 public:
-	Player(sf::Sprite &playerShape);
+	Player(sf::Sprite &playerShape, sf::Vector2f playerStart);
 	~Player();
 
-	void Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::RectangleShape> &blockBoundingBox, sf::Vector2f origin, sf::Vertex ($bottomLine)[3][2], sf::Vertex($rightLine)[3][2], sf::Vertex($leftLine)[3][2], bool &jumpVariable);
+	void Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::RectangleShape> &blockBoundingBox, sf::Vector2f origin, sf::Vertex ($bottomLine)[3][2], sf::Vertex($rightLine)[3][2], sf::Vertex($leftLine)[3][2], sf::Vertex($upLine)[3][2], bool &jumpVariable);
 
 	sf::Sprite playerSpriteUpdate(sf::Sprite &playerSprite, std::vector<sf::Texture> &spriteTexture, std::vector<sf::Texture>& walkingAnimation, std::vector <sf::Texture> &jumpingAnimation, float deltaTime, sf::Vector2f origin);
 
@@ -19,17 +19,22 @@ public:
 public:
 	
 
+
 	sf::Vector2f lastPosition;
 	sf::Vector2i velocity;
 	sf::Time animationTimer;
+	sf::Clock clock;
 
 	float time;
 
 	bool walking = true;
 	bool jumping = false;
+	bool allowedToDoubleJump = false;
+	bool hasDoubleJumped = false;
 	bool falling = false;
 	bool allowedToJump;	
 	bool walkingRight;
+	bool releasedSpaceKey = true;
 
 	int maxHorizontalVelocity;
 	int minHorizontalVelocity;
