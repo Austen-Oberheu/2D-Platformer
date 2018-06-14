@@ -1,6 +1,0 @@
-﻿  Player.cpp
-c:\users\auste\source\repos\2dplatformer\2d-platformer\2dplatformer\player.cpp(108): warning C4018: '<': signed/unsigned mismatch
-c:\users\auste\source\repos\2dplatformer\2d-platformer\2dplatformer\player.cpp(252): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\auste\source\repos\2dplatformer\2d-platformer\2dplatformer\player.cpp(264): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\auste\source\repos\2dplatformer\2d-platformer\2dplatformer\player.cpp(276): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  2DPlatformer.vcxproj -> C:\Users\auste\source\repos\2DPlatformer\2D-Platformer\Debug\2DPlatformer.exe
