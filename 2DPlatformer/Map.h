@@ -4,6 +4,7 @@
 #include <vector>
 #include <random>
 #include <functional>
+#include <chrono>
 
 #include "SFML/Graphics.hpp"
 
@@ -18,11 +19,12 @@ public:
 	std::vector<sf::FloatRect> MapBoundingBox();
 	sf::Vector2f PlayerStart();
 	bool CheckMapSolvable();
+	void GenerateRoom(int length, int width, sf::Vector2i roomOrigin);
 
 public:
 
-	const static int mapX = 25;
-	const static int mapY = 25;
+	const static int mapX = 100;
+	const static int mapY = 100;
 
 	int startX, startY, finishX, finishY;
 
