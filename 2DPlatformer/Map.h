@@ -20,6 +20,7 @@ public:
 	sf::Vector2f PlayerStart();
 	bool CheckMapSolvable();
 	void GenerateRoom(int length, int width, sf::Vector2i roomOrigin);
+	void GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint);
 
 public:
 

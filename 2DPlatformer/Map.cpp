@@ -18,44 +18,44 @@ void Map::GenerateMap()
 	levelArray[5][5] = 8;
 	levelArray[10][10] = 9;*/
 
-	std::default_random_engine generator;
-	generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
-	std::uniform_int_distribution<int> distribution(1, 6);
-	std::uniform_int_distribution<int> roomDistribution(1, 90);
+	//std::default_random_engine generator;
+	//generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
+	//std::uniform_int_distribution<int> distribution(1, 6);
+	//std::uniform_int_distribution<int> roomDistribution(1, 90);
 
-	//do {
-		int dice_roll = distribution(generator);
-		int room_roll = roomDistribution(generator);
+	////do {
+	//	int dice_roll = distribution(generator);
+	//	int room_roll = roomDistribution(generator);
 
-		auto dice = std::bind(distribution, generator);
-		auto room_dice = std::bind(roomDistribution, generator);
+	//	auto dice = std::bind(distribution, generator);
+	//	auto room_dice = std::bind(roomDistribution, generator);
 
-		for (int y = 1; y < mapY - 1; y++)
-		{
-			for (int x = 1; x < mapX - 1; x++)
-			{
-				int roomLength = dice() * 2;
-				int roomWidth = dice() * 2;
-				int roomPosX = room_dice();
-				int roomPosY = room_dice();
+	//	for (int y = 1; y < mapY - 1; y++)
+	//	{
+	//		for (int x = 1; x < mapX - 1; x++)
+	//		{
+	//			int roomLength = dice() * 2;
+	//			int roomWidth = dice() * 2;
+	//			int roomPosX = room_dice();
+	//			int roomPosY = room_dice();
 
-				levelArray[y][x] = room_dice();
+	//			levelArray[y][x] = room_dice();
 
-				if (levelArray[y][x] == 1)
-				{
-					
-					GenerateRoom(roomLength, roomWidth, sf::Vector2i(roomPosX, roomPosY));
-				}
-				else 
-				{				
-					levelArray[y][x] = 0;
-				}
-			}
-		}
+	//			if (levelArray[y][x] == 1)
+	//			{
+	//				
+	//				GenerateRoom(roomLength, roomWidth, sf::Vector2i(roomPosX, roomPosY));
+	//			}
+	//			else 
+	//			{				
+	//				levelArray[y][x] = 0;
+	//			}
+	//		}
+	//	}
 
 
 
-		/*for (int y = 0; y < mapY; y++)
+		for (int y = 0; y < mapY; y++)
 		{
 			levelArray[y][0] = 1;
 		}
@@ -70,7 +70,7 @@ void Map::GenerateMap()
 		for (int x = 0; x < mapX; x++)
 		{
 			levelArray[mapY - 1][x] = 1;
-		}*/
+		}
 
 
 		/*levelArray[5][5] = 8;
@@ -250,4 +250,8 @@ void Map::GenerateRoom(int length, int width, sf::Vector2i roomOrigin)
 		levelArray[roomOrigin.y + x][roomOrigin.x + width] = 1;
 	}
 
+}
+
+void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
+{
 }
