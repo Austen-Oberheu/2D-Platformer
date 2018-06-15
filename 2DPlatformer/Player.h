@@ -35,6 +35,7 @@ public:
 	bool allowedToJump;	
 	bool walkingRight;
 	bool releasedSpaceKey = true;
+	bool bottomCollision = false;
 
 	int maxHorizontalVelocity;
 	int minHorizontalVelocity;

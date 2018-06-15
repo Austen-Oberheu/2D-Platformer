@@ -63,6 +63,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Re
 			allowedToDoubleJump = true;
 			jumping = true;
 			falling = true;
+			bottomCollision = false;
 			clock.restart();
 		}
 	}
@@ -126,27 +127,34 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Re
 		i++;
 	}
 	//If this is not true then the player will fall
-	bool bottomCollision = false;
-
+	
+	bool secondaryBottomCollsion = false;
 	for (int i = 0; i < blockBoundingBox.size(); i++)
-	{		
-
-		for (int y = 0; y < 3;)
-		{
-			if (blockBoundingBox[i].getGlobalBounds().contains(bottomPoint[y]))
-			{
-				falling = false;
-				jumping = false;
-				allowedToJump = true;
-				hasDoubleJumped = false;
-				velocity.y = 0;
-				playerShape.setPosition(playerShape.getPosition().x, lastPosition.y - 0.01);
-				bottomCollision = true;
-
-			}
-			y++;
-		}
+	{	
 		
+		if (bottomCollision == false)
+		{
+			for (int y = 1; y < 3;)
+			{
+				if (blockBoundingBox[i].getGlobalBounds().contains(bottomPoint[y]))
+				{
+					falling = false;
+					jumping = false;
+					allowedToJump = true;
+					hasDoubleJumped = false;
+					velocity.y = 0;
+					playerShape.setPosition(playerShape.getPosition().x, blockBoundingBox[i].getPosition().y - 95);
+					bottomCollision = true;
+				}
+				y++;
+			}
+		}
+
+		if (blockBoundingBox[i].getGlobalBounds().contains(bottomPoint[0]))
+		{
+			secondaryBottomCollsion = true;
+		}
+	
 
 		for (int y = 0; y < 3;)
 		{
@@ -273,7 +281,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, std::vector<sf::Re
 		}
 	}*/
 
-	if ((falling == true && velocity.y < maxVerticalVelocity) || bottomCollision == false)
+	if ((falling == true && velocity.y < maxVerticalVelocity) || bottomCollision == false || secondaryBottomCollsion == false)
 	{
 		velocity.y += 50;
 	}
