@@ -22,6 +22,8 @@ public:
 	void GenerateRoom(int length, int width, sf::Vector2i roomOrigin);
 	void GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint);
 
+	int random_int_in_range(int first, int last);
+
 public:
 
 	const static int mapX = 100;
