@@ -289,10 +289,15 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 
 
 	sf::Vector2i currentSpace = originPoint;
+	std::vector <sf::Vector2i> previousSpaces;
+	previousSpaces.push_back(sf::Vector2i(NULL, NULL));
+	previousSpaces.push_back(sf::Vector2i(NULL, NULL));
+	sf::Vector2i nextSpace;
+	int stuckCounter = 0;
 	bool deadEnd = false;
 	
 	int direction = random_int_in_range(north, west);
-	while (deadEnd == false)
+	while(deadEnd == false && stuckCounter < 50)
 	{
 		//Small chance that the hallway will change direction
 		int changeDirection = dice();
@@ -305,8 +310,20 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 		{
 			if (levelArray[currentSpace.y - 1][currentSpace.x] == 0)
 			{
-				levelArray[currentSpace.y - 1][currentSpace.x] = 1;
-				currentSpace = sf::Vector2i(currentSpace.x, currentSpace.y - 1);
+				nextSpace.x = currentSpace.x;
+				nextSpace.y = currentSpace.y - 1;
+
+				if (checkIfAdjancentSquares(currentSpace, nextSpace, previousSpaces))
+				{
+					levelArray[currentSpace.y - 1][currentSpace.x] = 1;
+					previousSpaces.emplace(previousSpaces.begin(), currentSpace);
+					if (previousSpaces.size() > 2)
+						previousSpaces.pop_back();
+
+					currentSpace = sf::Vector2i(currentSpace.x, currentSpace.y - 1);
+					stuckCounter = 0;
+				}
+		
 			}
 			else
 			{
@@ -343,8 +360,20 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 		{
 			if (levelArray[currentSpace.y + 1][currentSpace.x] == 0)
 			{
-				levelArray[currentSpace.y + 1][currentSpace.x] = 1;
-				currentSpace = sf::Vector2i(currentSpace.x, currentSpace.y + 1);
+				nextSpace.x = currentSpace.x;
+				nextSpace.y = currentSpace.y + 1;
+
+				if (checkIfAdjancentSquares(currentSpace, nextSpace, previousSpaces))
+				{
+					levelArray[currentSpace.y + 1][currentSpace.x] = 1;
+					previousSpaces.emplace(previousSpaces.begin(), currentSpace);
+					if (previousSpaces.size() > 2)
+						previousSpaces.pop_back();
+
+					currentSpace = sf::Vector2i(currentSpace.x, currentSpace.y + 1);
+					stuckCounter = 0;
+				}
+			
 			}
 			else
 			{
@@ -381,8 +410,20 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 		{
 			if (levelArray[currentSpace.y][currentSpace.x + 1] == 0)
 			{
-				levelArray[currentSpace.y][currentSpace.x + 1] = 1;
-				currentSpace = sf::Vector2i(currentSpace.x + 1, currentSpace.y);
+				nextSpace.x = currentSpace.x + 1;
+				nextSpace.y = currentSpace.y;
+
+				if (checkIfAdjancentSquares(currentSpace, nextSpace, previousSpaces))
+				{
+					levelArray[currentSpace.y][currentSpace.x + 1] = 1;
+					previousSpaces.emplace(previousSpaces.begin(), currentSpace);
+					if (previousSpaces.size() > 2)
+						previousSpaces.pop_back();
+
+					currentSpace = sf::Vector2i(currentSpace.x + 1, currentSpace.y);
+					stuckCounter = 0;
+				}
+			
 			}
 			else
 			{
@@ -419,8 +460,20 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 		{
 			if (levelArray[currentSpace.y][currentSpace.x - 1] == 0)
 			{
-				levelArray[currentSpace.y][currentSpace.x - 1] = 1;
-				currentSpace = sf::Vector2i(currentSpace.x - 1, currentSpace.y);
+				nextSpace.x = currentSpace.x - 1;
+				nextSpace.y = currentSpace.y;
+
+				if (checkIfAdjancentSquares(currentSpace, nextSpace, previousSpaces))
+				{
+					levelArray[currentSpace.y][currentSpace.x - 1] = 1;
+					previousSpaces.emplace(previousSpaces.begin(), currentSpace);
+					if (previousSpaces.size() > 2)
+						previousSpaces.pop_back();
+
+					currentSpace = sf::Vector2i(currentSpace.x - 1, currentSpace.y);
+					stuckCounter = 0;
+				}
+			
 			}
 			else
 			{
@@ -453,12 +506,48 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 			}
 
 		}
-		if (currentSpace.x > mapX || currentSpace.x < (mapX - mapX) || currentSpace.y > mapY || currentSpace.y < (mapY - mapY))
+		if (currentSpace.x + 1 > mapX || currentSpace.x - 1 < (mapX - mapX) || currentSpace.y + 1 > mapY || currentSpace.y - 1 < (mapY - mapY))
 		{
 			std::cout << "Hit Border with hallway" << std::endl;
+			direction = random_int_in_range(north, west);
 		}
+		stuckCounter++;
 		std::cout << currentSpace.x << " " << currentSpace.y << std::endl;
 	}
+}
+
+bool Map::checkIfAdjancentSquares(sf::Vector2i currentSpace, sf::Vector2i nextSpace, std::vector <sf::Vector2i> previousSpaces)
+{
+	//Set the current space to 2 so we know which space is the only one that should already have a value
+	//But it will be changed back at the end
+	levelArray[currentSpace.y][currentSpace.x] = 2;
+	if (previousSpaces[0].x != NULL)
+	{
+		for (int i = 0; i < previousSpaces.size(); i++)
+		{
+			levelArray[previousSpaces[i].y][previousSpaces[i].x] = 3;
+		}
+	}
+
+	//Checks all adjancent squares to see whether any already have a square and also skips the current square
+	if (   (levelArray[nextSpace.y - 1][nextSpace.x - 1] == 0 || levelArray[nextSpace.y - 1][nextSpace.x - 1] == 3) && (levelArray[nextSpace.y - 1][nextSpace.x] == 0 || levelArray[nextSpace.y - 1][nextSpace.x] == 2 || levelArray[nextSpace.y - 1][nextSpace.x] == 3)
+		&& (levelArray[nextSpace.y - 1][nextSpace.x + 1] == 0 || levelArray[nextSpace.y - 1][nextSpace.x + 1] == 3) && (levelArray[nextSpace.y][nextSpace.x + 1] == 0 || levelArray[nextSpace.y][nextSpace.x + 1] == 2 || levelArray[nextSpace.y][nextSpace.x + 1] == 3)
+		&& (levelArray[nextSpace.y + 1][nextSpace.x + 1] == 0 || levelArray[nextSpace.y + 1][nextSpace.x + 1] == 3) && (levelArray[nextSpace.y + 1][nextSpace.x] == 0 || levelArray[nextSpace.y + 1][nextSpace.x] == 2 || levelArray[nextSpace.y + 1][nextSpace.x] == 3)
+		&& (levelArray[nextSpace.y + 1][nextSpace.x - 1] == 0 || levelArray[nextSpace.y + 1][nextSpace.x - 1] == 3) && (levelArray[nextSpace.y][nextSpace.x - 1] == 0 || levelArray[nextSpace.y][nextSpace.x - 1] == 2 || levelArray[nextSpace.y][nextSpace.x - 1] == 3))
+	{
+		levelArray[currentSpace.y][currentSpace.x] = 1;
+		for (int i = 0; i < previousSpaces.size(); i++)
+		{
+			levelArray[previousSpaces[i].y][previousSpaces[i].x] = 1;
+		}
+		return true;
+	}
+	levelArray[currentSpace.y][currentSpace.x] = 1;
+	for (int i = 0; i < previousSpaces.size(); i++)
+	{
+		levelArray[previousSpaces[i].y][previousSpaces[i].x] = 1;
+	}
+	return false;
 }
 
 int Map::random_int_in_range(int first, int last)

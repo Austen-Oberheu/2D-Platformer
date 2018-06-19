@@ -22,6 +22,8 @@ public:
 	void GenerateRoom(int length, int width, sf::Vector2i roomOrigin);
 	void GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint);
 
+	bool checkIfAdjancentSquares(sf::Vector2i currentSpace, sf::Vector2i nextSpace, std::vector <sf::Vector2i> previousSpaces);
+
 	int random_int_in_range(int first, int last);
 
 public:
