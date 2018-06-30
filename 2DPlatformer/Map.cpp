@@ -23,10 +23,25 @@ void Map::GenerateMap()
 	levelArray[5][5] = 8;
 	levelArray[10][10] = 9;*/
 
-	//std::default_random_engine generator;
-	//generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
-	//std::uniform_int_distribution<int> distribution(1, 6);
-	//std::uniform_int_distribution<int> roomDistribution(1, 90);
+	std::default_random_engine generator;
+	generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
+	std::uniform_int_distribution<int> distribution(3, 98);
+
+
+	int trys = 0;
+
+	while (trys < 1)
+	{
+		int dice_roll = distribution(generator);
+		auto dice = std::bind(distribution, generator);
+		
+		int hallwayX = dice();
+		int hallwayY = dice();
+
+		GenerateHallway(sf::Vector2i(hallwayX, hallwayY), sf::Vector2i(0, 0));
+		trys++;
+
+	}
 
 	////do {
 	//	int dice_roll = distribution(generator);
@@ -107,12 +122,21 @@ std::vector<sf::RectangleShape> Map::DrawMap()
 				blockBoundingBox.push_back(boxCollision);
 				blockArray.push_back(block);
 			}
-			if (levelArray[y][x] == 8)
+			else if (levelArray[y][x] == hallwayIndex)
+			{
+				sf::RectangleShape block2(sf::Vector2f(100.f, 100.f));
+				block2.setPosition(x * 100, 600 + (y * 100));
+				sf::FloatRect boxCollision2 = block2.getGlobalBounds();
+				blockBoundingBox.push_back(boxCollision2);
+				blockArray.push_back(block2);
+
+			}
+			else if (levelArray[y][x] == 8)
 			{
 				playerStart.x = x * Xoffset;
 				playerStart.y = 600 + (y * Yoffset);
 			}
-			if (levelArray[y][x] == 9)
+			else if (levelArray[y][x] == 9)
 			{
 				sf::RectangleShape block(sf::Vector2f(100.f, 100.f));
 				block.setPosition(x * Xoffset, 600 + (y * Yoffset));
@@ -295,7 +319,9 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 	sf::Vector2i nextSpace;
 	int stuckCounter = 0;
 	bool deadEnd = false;
-	
+
+	//first check if the starting spot is valid. ie it doesnt border any existing spaces
+
 	int direction = random_int_in_range(north, west);
 	while(deadEnd == false && stuckCounter < 50)
 	{
@@ -315,7 +341,7 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 
 				if (checkIfAdjancentSquares(currentSpace, nextSpace, previousSpaces))
 				{
-					levelArray[currentSpace.y - 1][currentSpace.x] = 1;
+					levelArray[currentSpace.y - 1][currentSpace.x] = hallwayIndex;
 					previousSpaces.emplace(previousSpaces.begin(), currentSpace);
 					if (previousSpaces.size() > 2)
 						previousSpaces.pop_back();
@@ -365,7 +391,7 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 
 				if (checkIfAdjancentSquares(currentSpace, nextSpace, previousSpaces))
 				{
-					levelArray[currentSpace.y + 1][currentSpace.x] = 1;
+					levelArray[currentSpace.y + 1][currentSpace.x] = hallwayIndex;
 					previousSpaces.emplace(previousSpaces.begin(), currentSpace);
 					if (previousSpaces.size() > 2)
 						previousSpaces.pop_back();
@@ -415,7 +441,7 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 
 				if (checkIfAdjancentSquares(currentSpace, nextSpace, previousSpaces))
 				{
-					levelArray[currentSpace.y][currentSpace.x + 1] = 1;
+					levelArray[currentSpace.y][currentSpace.x + 1] = hallwayIndex;
 					previousSpaces.emplace(previousSpaces.begin(), currentSpace);
 					if (previousSpaces.size() > 2)
 						previousSpaces.pop_back();
@@ -465,7 +491,7 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 
 				if (checkIfAdjancentSquares(currentSpace, nextSpace, previousSpaces))
 				{
-					levelArray[currentSpace.y][currentSpace.x - 1] = 1;
+					levelArray[currentSpace.y][currentSpace.x - 1] = hallwayIndex;
 					previousSpaces.emplace(previousSpaces.begin(), currentSpace);
 					if (previousSpaces.size() > 2)
 						previousSpaces.pop_back();
@@ -506,7 +532,7 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 			}
 
 		}
-		if (currentSpace.x + 1 > mapX || currentSpace.x - 1 < (mapX - mapX) || currentSpace.y + 1 > mapY || currentSpace.y - 1 < (mapY - mapY))
+		if (currentSpace.x + 1 > mapX || currentSpace.x - 3 < (mapX - mapX) || currentSpace.y + 1 > mapY || currentSpace.y - 3 < (mapY - mapY))
 		{
 			std::cout << "Hit Border with hallway" << std::endl;
 			direction = random_int_in_range(north, west);
@@ -538,14 +564,14 @@ bool Map::checkIfAdjancentSquares(sf::Vector2i currentSpace, sf::Vector2i nextSp
 		levelArray[currentSpace.y][currentSpace.x] = 1;
 		for (int i = 0; i < previousSpaces.size(); i++)
 		{
-			levelArray[previousSpaces[i].y][previousSpaces[i].x] = 1;
+			levelArray[previousSpaces[i].y][previousSpaces[i].x] = hallwayIndex;
 		}
 		return true;
 	}
 	levelArray[currentSpace.y][currentSpace.x] = 1;
 	for (int i = 0; i < previousSpaces.size(); i++)
 	{
-		levelArray[previousSpaces[i].y][previousSpaces[i].x] = 1;
+		levelArray[previousSpaces[i].y][previousSpaces[i].x] = hallwayIndex;
 	}
 	return false;
 }

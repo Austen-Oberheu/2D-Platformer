@@ -38,6 +38,8 @@ public:
 	int Xoffset = 100;
 	int Yoffset = 100;
 
+	const int hallwayIndex = 10;
+
 	sf::Vector2f playerStart;
 
 	int levelArray[mapX][mapY];
