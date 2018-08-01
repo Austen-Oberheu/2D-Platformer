@@ -22,6 +22,8 @@ public:
 	void GenerateRoom(int length, int width, sf::Vector2i roomOrigin);
 	void GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint);
 
+	const int* ReturnMap();
+
 	bool checkIfAdjancentSquares(sf::Vector2i currentSpace, sf::Vector2i nextSpace, std::vector <sf::Vector2i> previousSpaces);
 
 	int random_int_in_range(int first, int last);
@@ -38,7 +40,7 @@ public:
 	int Xoffset = 100;
 	int Yoffset = 100;
 
-	sf::Vector2f playerStart;
+	sf::Vector2f playerStart = sf::Vector2f(50.f, 50.f);
 
 	int levelArray[mapX][mapY];
 	

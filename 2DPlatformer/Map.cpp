@@ -95,7 +95,7 @@ void Map::GenerateMap()
 std::vector<sf::RectangleShape> Map::DrawMap()
 {
 
-	for (int y = 0; y < mapY; y++)
+	/*for (int y = 0; y < mapY; y++)
 	{
 		for (int x = 0; x < mapX; x++)
 		{
@@ -120,7 +120,7 @@ std::vector<sf::RectangleShape> Map::DrawMap()
 				blockArray.push_back(block);
 			}
 		}
-	}
+	}*/
 
 	return blockArray;
 }
@@ -515,6 +515,12 @@ void Map::GenerateHallway(sf::Vector2i originPoint, sf::Vector2i endPoint)
 		std::cout << currentSpace.x << " " << currentSpace.y << std::endl;
 	}
 }
+
+const int * Map::ReturnMap()
+{
+	return *levelArray;
+}
+
 
 bool Map::checkIfAdjancentSquares(sf::Vector2i currentSpace, sf::Vector2i nextSpace, std::vector <sf::Vector2i> previousSpaces)
 {
