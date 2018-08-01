@@ -67,7 +67,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && allowedToJump == false && clock.getElapsedTime().asMilliseconds() > 250)
+	/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && allowedToJump == false && clock.getElapsedTime().asMilliseconds() > 250)
 	{
 		if (allowedToDoubleJump == true)
 		{
@@ -79,7 +79,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 			falling = true;
 			releasedSpaceKey = false;
 		}
-	}
+	}*/
 
 
 	
@@ -115,10 +115,10 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 	right = playerShape.getPosition().x + playerShape.getTextureRect().width;
 	top = playerShape.getPosition().y;
 
-	sf::Vector2i topLeft(sf::Vector2i((int)left / 48, (int)top / 48));
-	sf::Vector2i topRight(sf::Vector2i((int)right / 48, (int)top / 48));
-	sf::Vector2i bottomLeft(sf::Vector2i((int)left / 48, (int)bottom / 48));
-	sf::Vector2i bottomRight(sf::Vector2i((int)right / 48, (int)bottom / 48));
+	sf::Vector2i topLeft(sf::Vector2i((int)left / 32, (int)top / 32));
+	sf::Vector2i topRight(sf::Vector2i((int)right / 32, (int)top / 32));
+	sf::Vector2i bottomLeft(sf::Vector2i((int)left / 32, (int)bottom / 32));
+	sf::Vector2i bottomRight(sf::Vector2i((int)right / 32, (int)bottom / 32));
 
 	tiles.clear();
 
@@ -131,8 +131,17 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 	{
 		if (map[tiles[i].y][tiles[i].x] == 1)
 		{
-			playerShape.setPosition(lastPosition.back().x, lastPosition.back().y);
-			lastPosition.pop_back();
+			velocity.x = 0;
+			velocity.y = 0;
+			playerShape.setPosition(lastPosition.front().x, lastPosition.front().y);
+			lastPosition.pop_front();
+			falling = false;
+			std::cout << "tile collision" << std::endl;
+			break;
+		}
+		else
+		{
+			falling = true;
 		}
 	}
 	
@@ -153,7 +162,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 	//}
 	////If this is not true then the player will fall
 	//
-	bool secondaryBottomCollsion = true;
+	//bool secondaryBottomCollsion = false;
 	//for (int i = 0; i < blockBoundingBox.size(); i++)
 	//{	
 	//	
@@ -306,9 +315,9 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 		}
 	}*/
 
-	if ((falling == true && velocity.y < maxVerticalVelocity) || bottomCollision == false || secondaryBottomCollsion == false)
+	if ((falling == true && velocity.y < maxVerticalVelocity))
 	{
-		//velocity.y += 50;
+		velocity.y += 50;
 	}
 
 	jumpVariable = allowedToJump;

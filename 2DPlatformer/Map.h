@@ -40,7 +40,7 @@ public:
 	int Xoffset = 100;
 	int Yoffset = 100;
 
-	sf::Vector2f playerStart = sf::Vector2f(50.f, 50.f);
+	sf::Vector2f playerStart = sf::Vector2f(500.f, 500.f);
 
 	int levelArray[mapX][mapY];
 	
