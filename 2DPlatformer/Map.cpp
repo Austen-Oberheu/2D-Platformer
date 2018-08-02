@@ -95,33 +95,7 @@ void Map::GenerateMap()
 std::vector<sf::RectangleShape> Map::DrawMap()
 {
 
-	/*for (int y = 0; y < mapY; y++)
-	{
-		for (int x = 0; x < mapX; x++)
-		{
-			if (levelArray[y][x] == 1)
-			{
-				sf::RectangleShape block(sf::Vector2f(100.f, 100.f));
-				block.setPosition(x * Xoffset, 600 + (y * Yoffset));
-				sf::FloatRect boxCollision = block.getGlobalBounds();
-				blockBoundingBox.push_back(boxCollision);
-				blockArray.push_back(block);
-			}
-			if (levelArray[y][x] == 8)
-			{
-				playerStart.x = x * Xoffset;
-				playerStart.y = 600 + (y * Yoffset);
-			}
-			if (levelArray[y][x] == 9)
-			{
-				sf::RectangleShape block(sf::Vector2f(100.f, 100.f));
-				block.setPosition(x * Xoffset, 600 + (y * Yoffset));
-				block.setFillColor(sf::Color::Green);
-				blockArray.push_back(block);
-			}
-		}
-	}*/
-
+	
 	return blockArray;
 }
 

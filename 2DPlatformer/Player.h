@@ -28,7 +28,14 @@ public:
 	sf::Clock clock;
 
 	float bottom, left, right, top;
-	std::vector<sf::Vector2i> tiles;
+	std::vector<sf::Vector2i> bottomTiles;
+	std::vector<sf::Vector2i> bottomRightTiles;
+	std::vector<sf::Vector2i> bottomLeftTiles;
+
+	std::vector<sf::Vector2i> leftTiles;
+	std::vector<sf::Vector2i> rightTiles;
+	std::vector<sf::Vector2i> topTiles;
+
 
 	float time;
 

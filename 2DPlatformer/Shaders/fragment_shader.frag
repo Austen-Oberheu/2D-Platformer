@@ -1,6 +1,9 @@
-#define S (iResolution.x / 6e1) // The cell size.
+uniform sampler2D texture;
+uniform float pixel_threshold;
 
-void mainImage(out vec4 c, vec2 p)
+void main()
 {
-    c = texture2D(texture, floor((p + .5) / S) * S / iResolution.xy);
+    float factor = 1.0 / (pixel_threshold + 0.001);
+    vec2 pos = floor(gl_TexCoord[0].xy * factor + 0.5) / factor;
+    gl_FragColor = texture2D(texture, pos) * gl_Color;
 }

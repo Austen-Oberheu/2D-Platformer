@@ -67,7 +67,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 		}
 	}
 
-	/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && allowedToJump == false && clock.getElapsedTime().asMilliseconds() > 250)
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && allowedToJump == false && clock.getElapsedTime().asMilliseconds() > 250)
 	{
 		if (allowedToDoubleJump == true)
 		{
@@ -79,7 +79,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 			falling = true;
 			releasedSpaceKey = false;
 		}
-	}*/
+	}
 
 
 	
@@ -108,214 +108,107 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 			velocity.x -= 50;
 		}
 	}
-	
 
-	bottom = playerShape.getPosition().y + playerShape.getTextureRect().height;
+	//New Collision Code, takes the ray traces and just uses their farthest out point and checks if they collide with any of the tiles that the character is touching
+	//And if so check what kind of tile, if it is a solid one it causes a collision
+
+	sf::Vector2i bottomPoint;
+	sf::Vector2i bottomRightPoint;
+	sf::Vector2i bottomLeftPoint;
+
+	sf::Vector2i rightPoint;
+	sf::Vector2i leftPoint;
+	sf::Vector2i topPoint;
+
+	
+	bottomPoint = sf::Vector2i($bottomLine[0][1].position.x / 48, $bottomLine[0][1].position.y / 48);
+	bottomRightPoint = sf::Vector2i($bottomLine[2][1].position.x / 48, $bottomLine[2][1].position.y / 48);
+	bottomLeftPoint = sf::Vector2i($bottomLine[1][1].position.x / 48, $bottomLine[1][1].position.y / 48);
+
+	rightPoint = sf::Vector2i($rightLine[1][1].position.x / 48, $rightLine[1][1].position.y / 48);
+	leftPoint = sf::Vector2i($leftLine[1][1].position.x / 48, $leftLine[1][1].position.y / 48);
+	topPoint = sf::Vector2i($upLine[1][1].position.x / 48, $upLine[1][1].position.y / 48);
+	
+	bottom = playerShape.getPosition().y + playerShape.getGlobalBounds().height;
 	left = playerShape.getPosition().x;
-	right = playerShape.getPosition().x + playerShape.getTextureRect().width;
+	right = playerShape.getPosition().x + playerShape.getGlobalBounds().width;
 	top = playerShape.getPosition().y;
 
-	sf::Vector2i topLeft(sf::Vector2i((int)left / 32, (int)top / 32));
-	sf::Vector2i topRight(sf::Vector2i((int)right / 32, (int)top / 32));
-	sf::Vector2i bottomLeft(sf::Vector2i((int)left / 32, (int)bottom / 32));
-	sf::Vector2i bottomRight(sf::Vector2i((int)right / 32, (int)bottom / 32));
+	topTiles.clear();
+	leftTiles.clear();
+	rightTiles.clear();
+	bottomTiles.clear();
+	bottomRightTiles.clear();
+	bottomLeftTiles.clear();
 
-	tiles.clear();
+	if (std::find(topTiles.begin(), topTiles.end(), topPoint) == topTiles.end()) topTiles.push_back(topPoint);
+	if (std::find(rightTiles.begin(), rightTiles.end(), rightPoint) == rightTiles.end()) rightTiles.push_back(rightPoint);
+	if (std::find(bottomTiles.begin(), bottomTiles.end(), bottomPoint) == bottomTiles.end()) bottomTiles.push_back(bottomPoint);
+	if (std::find(leftTiles.begin(), leftTiles.end(), leftPoint) == leftTiles.end()) leftTiles.push_back(leftPoint);
 
-	tiles.push_back(topLeft);
-	if (std::find(tiles.begin(), tiles.end(), topRight) == tiles.end()) tiles.push_back(topRight);
-	if (std::find(tiles.begin(), tiles.end(), bottomLeft) == tiles.end()) tiles.push_back(bottomLeft);
-	if (std::find(tiles.begin(), tiles.end(), bottomRight) == tiles.end()) tiles.push_back(bottomRight);
+	if (std::find(bottomLeftTiles.begin(), bottomLeftTiles.end(), bottomLeftPoint) == bottomLeftTiles.end()) bottomLeftTiles.push_back(bottomLeftPoint);
+	if (std::find(bottomRightTiles.begin(), bottomRightTiles.end(), bottomRightPoint) == bottomRightTiles.end()) bottomRightTiles.push_back(bottomRightPoint);
 
-	for (int i = 0; i < tiles.size(); i++)
+	bool secondaryBottomCollsion = false;
+
+	for (int i = 0; i < bottomTiles.size(); i++)
 	{
-		if (map[tiles[i].y][tiles[i].x] == 1)
+		if (map[bottomTiles[i].y][bottomTiles[i].x] == 1)
 		{
-			velocity.x = 0;
-			velocity.y = 0;
-			playerShape.setPosition(lastPosition.front().x, lastPosition.front().y);
-			lastPosition.pop_front();
-			falling = false;
-			std::cout << "tile collision" << std::endl;
+			
+			
+			
+			//playerShape.setPosition(playerShape.getPosition().x, lastPosition.front().y);
+			//lastPosition.pop_front();
+			bottomCollision = true;
 			break;
 		}
 		else
 		{
+			bottomCollision = false;
 			falling = true;
 		}
 	}
-	
-	//sf::FloatRect playerBoundingBox = playerShape.getGlobalBounds();
-	//std::vector<sf::RectangleShape> collidedTiles;
 
-	//sf::Vector2f bottomPoint[3];
-	//sf::Vector2f rightPoint[3];
-	//sf::Vector2f leftPoint[3];
-	//sf::Vector2f topPoint[3];
-	//for (int i = 0; i < 3;)
-	//{
-	//	bottomPoint[i] = $bottomLine[i][1].position;
-	//	rightPoint[i] = $rightLine[i][1].position;
-	//	leftPoint[i] = $leftLine[i][1].position;
-	//	topPoint[i] = $upLine[i][1].position;
-	//	i++;
-	//}
-	////If this is not true then the player will fall
-	//
-	//bool secondaryBottomCollsion = false;
-	//for (int i = 0; i < blockBoundingBox.size(); i++)
-	//{	
-	//	
-	//	if (bottomCollision == false)
-	//	{
-	//		for (int y = 1; y < 3;)
-	//		{
-	//			if (blockBoundingBox[i].getGlobalBounds().contains(bottomPoint[y]))
-	//			{
-	//				falling = false;
-	//				jumping = false;
-	//				allowedToJump = true;
-	//				hasDoubleJumped = false;
-	//				velocity.y = 0;
-	//				playerShape.setPosition(playerShape.getPosition().x, blockBoundingBox[i].getPosition().y - 95);
-	//				bottomCollision = true;
-	//			}
-	//			y++;
-	//		}
-	//	}
-
-	//	if (blockBoundingBox[i].getGlobalBounds().contains(bottomPoint[0]))
-	//	{
-	//		secondaryBottomCollsion = true;
-	//	}
-	//
-
-	//	for (int y = 0; y < 3;)
-	//	{
-	//		if (blockBoundingBox[i].getGlobalBounds().contains(rightPoint[y]))
-	//		{
-	//			//std::cout << "Hit Side" << std::endl;
-	//			if (falling == true)
-	//			{
-	//				playerShape.setPosition(lastPosition.x - 1, playerShape.getPosition().y);
-	//			}
-	//			else
-	//			{
-	//				velocity.x = 0;
-	//				playerShape.setPosition(lastPosition.x, playerShape.getPosition().y);
-	//			}
-	//		}
-	//		y++;
-	//	}
-
-	//	for (int y = 0; y < 3;)
-	//	{
-	//		if (blockBoundingBox[i].getGlobalBounds().contains(leftPoint[y]))
-	//		{
-	//			if (falling == true)
-	//			{
-	//				playerShape.setPosition(lastPosition.x + 1, playerShape.getPosition().y);
-	//			}
-	//			else
-	//			{
-	//				//std::cout << "Hit Side" << std::endl;
-	//				velocity.x = 0;
-	//				playerShape.setPosition(lastPosition.x, playerShape.getPosition().y);
-	//			}
-	//		}
-	//		y++;
-	//	}
-
-	//	for (int y = 0; y < 3;)
-	//	{
-	//		if (blockBoundingBox[i].getGlobalBounds().contains(topPoint[y]))
-	//		{
-	//			//std::cout << "Hit Side" << std::endl;
-	//			velocity.x = 0;
-	//			playerShape.setPosition(lastPosition.x, lastPosition.y + 1);
-	//			if (jumping == true)
-	//			{
-	//				velocity.y = 100;
-	//				falling = true;
-
-	//			}
-	//		}
-	//		y++;
-	//	}
-	//	
-	//	//if (playerBoundingBox.intersects(blockBoundingBox[i].getGlobalBounds()))
-	//	//{
-	//	//	//collidedTiles.push_back(blockBoundingBox[i]);
-	//	//	if (playerShape.getPosition().x - blockBoundingBox[i].getPosition().x  < playerShape.getPosition().y - blockBoundingBox[i].getPosition().y)
-	//	//	{
-	//	//		//playerShape.setPosition(blockBoundingBox[i].getPosition().x - playerShape.getOrigin().x, playerShape.getPosition().y);
-	//	//		velocity.x = 0;
-	//	//	}
-	//	//	if (playerShape.getPosition().y - blockBoundingBox[i].getPosition().y < playerShape.getPosition().x - blockBoundingBox[i].getPosition().x)
-	//	//	{
-	//	//		//playerShape.setPosition(playerShape.getPosition().x, blockBoundingBox[i].getPosition().y - playerShape.getOrigin().y);
-	//	//		falling = false;
-	//	//		jumping = false;
-	//	//		allowedToJump = true;
-	//	//		velocity.y = 0;
-	//	//		playerShape.setPosition(playerShape.getPosition().x, lastPosition.y);
-	//	//		
-	//	//	}
-	//	//	if (playerShape.getPosition().x - blockBoundingBox[i].getTextureRect().width < playerShape.getPosition().y - blockBoundingBox[i].getPosition().y)
-	//	//	{
-	//	//		//playerShape.setPosition(blockBoundingBox[i].getTextureRect().width + playerShape.getOrigin().x, playerShape.getPosition().y);
-	//	//		velocity.x = 0;
-	//	//	}
-	//	//}
-	//}
-
-
-
-
-	/*for (int i = 0; i < collidedTiles.size(); i++)
+	for (int i = 0; i < bottomRightTiles.size(); i++) 
 	{
-		if (collidedTiles[i].getPosition().y - playerShape.getPosition().y <= playerShape.getGlobalBounds().height &&
-			playerShape.getPosition().y - collidedTiles[i].getPosition().y < playerShape.getPosition().x - collidedTiles[i].getPosition().x) velocity.y > 0 && allowedToJump == false || velocity.y < 0
+		if (map[bottomRightTiles[i].y][bottomRightTiles[i].x] == 1)
 		{
-			falling = false;
 			jumping = false;
 			allowedToJump = true;
+			hasDoubleJumped = false;
+			falling = false;
 			velocity.y = 0;
-			playerShape.setPosition(playerShape.getPosition().x, lastPosition.y);
-			collidedTiles[i] = std::move(collidedTiles.back());
-			collidedTiles.pop_back();
-			i = 0;
+			secondaryBottomCollsion = true;
 		}
-		
 	}
-	std::cout << collidedTiles.size() << std::endl;
-	for (int i = 0; i < collidedTiles.size(); i++)
+
+	for (int i = 0; i < bottomLeftTiles.size(); i++)
 	{
-		if (playerShape.getPosition().x - collidedTiles[i].getPosition().x < playerShape.getGlobalBounds().width - collidedTiles[i].getGlobalBounds().width 
-			&& playerShape.getPosition().y - collidedTiles[i].getPosition().y < playerShape.getTextureRect().height)
+		if (map[bottomLeftTiles[i].y][bottomLeftTiles[i].x] == 1)
 		{
-			std::cout << "Hit Side" << std::endl;
-			velocity.x = 0;
-			playerShape.setPosition(lastPosition.x, playerShape.getPosition().y);
-			break;
+			jumping = false;
+			allowedToJump = true;
+			hasDoubleJumped = false;
+			falling = false;
+			velocity.y = 0;
+			secondaryBottomCollsion = true;
 		}
+	}
 
-		
-	}*/
 
-	/*if (bottomCollision == false)
+
+	if (bottomCollision == true && secondaryBottomCollsion == false)
 	{
-		for (int z = 0; z < 3;)
-		{
-			if (!blockBoundingBox[i].getGlobalBounds().contains(bottomPoint[z]))
-			{
-				falling = true;
-			}
-			z++;
-		}
-	}*/
+		falling == false;
+	}
+	else if (bottomCollision == true && secondaryBottomCollsion == true)
+	{
+		playerShape.setPosition(playerShape.getPosition().x, lastPosition.front().y);
+		lastPosition.pop_front();
+	}
 
-	if ((falling == true && velocity.y < maxVerticalVelocity))
+	if (falling == true && velocity.y < maxVerticalVelocity)
 	{
 		velocity.y += 50;
 	}
