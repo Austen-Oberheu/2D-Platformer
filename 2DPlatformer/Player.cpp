@@ -112,6 +112,8 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 	//New Collision Code, takes the ray traces and just uses their farthest out point and checks if they collide with any of the tiles that the character is touching
 	//And if so check what kind of tile, if it is a solid one it causes a collision
 
+	resetPosition = false;
+
 	sf::Vector2i bottomPoint;
 	sf::Vector2i bottomRightPoint;
 	sf::Vector2i bottomLeftPoint;
@@ -125,9 +127,9 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 	bottomRightPoint = sf::Vector2i($bottomLine[2][1].position.x / 48, $bottomLine[2][1].position.y / 48);
 	bottomLeftPoint = sf::Vector2i($bottomLine[1][1].position.x / 48, $bottomLine[1][1].position.y / 48);
 
-	rightPoint = sf::Vector2i($rightLine[1][1].position.x / 48, $rightLine[1][1].position.y / 48);
-	leftPoint = sf::Vector2i($leftLine[1][1].position.x / 48, $leftLine[1][1].position.y / 48);
-	topPoint = sf::Vector2i($upLine[1][1].position.x / 48, $upLine[1][1].position.y / 48);
+	rightPoint = sf::Vector2i($rightLine[0][1].position.x / 48, $rightLine[0][1].position.y / 48);
+	leftPoint = sf::Vector2i($leftLine[0][1].position.x / 48, $leftLine[0][1].position.y / 48);
+	topPoint = sf::Vector2i($upLine[0][1].position.x / 48, $upLine[0][1].position.y / 48);
 	
 	bottom = playerShape.getPosition().y + playerShape.getGlobalBounds().height;
 	left = playerShape.getPosition().x;
@@ -155,9 +157,6 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 	{
 		if (map[bottomTiles[i].y][bottomTiles[i].x] == 1)
 		{
-			
-			
-			
 			//playerShape.setPosition(playerShape.getPosition().x, lastPosition.front().y);
 			//lastPosition.pop_front();
 			bottomCollision = true;
@@ -196,16 +195,58 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 		}
 	}
 
+	for (int i = 0; i < topTiles.size(); i++)
+	{
+		if (map[topTiles[i].y][topTiles[i].x] == 1)
+		{
+   			playerShape.setPosition(playerShape.getPosition().x, lastPosition.front().y);
+			lastPosition.pop_front();
+			resetPosition = true;
+			velocity.y = 0;
+			falling = true;
+			break;
+		}
+
+	}
+
+	for (int i = 0; i < rightTiles.size(); i++)
+	{
+		if (map[rightTiles[i].y][rightTiles[i].x] == 1)
+		{
+			playerShape.setPosition(lastPosition.front().x, playerShape.getPosition().y);
+			lastPosition.pop_front();
+			resetPosition = true;
+			velocity.x = 0;
+			allowedToJump = true;
+			break;
+		}
+
+	}
+
+	for (int i = 0; i < leftTiles.size(); i++)
+	{
+		if (map[leftTiles[i].y][leftTiles[i].x] == 1)
+		{
+			playerShape.setPosition(lastPosition.front().x, playerShape.getPosition().y);
+			lastPosition.pop_front();
+			resetPosition = true;
+			velocity.x = 0;
+			allowedToJump = true;
+			break;
+		}
+
+	}
 
 
 	if (bottomCollision == true && secondaryBottomCollsion == false)
 	{
-		falling == false;
+		falling = false;
 	}
 	else if (bottomCollision == true && secondaryBottomCollsion == true)
 	{
 		playerShape.setPosition(playerShape.getPosition().x, lastPosition.front().y);
 		lastPosition.pop_front();
+		resetPosition = true;
 	}
 
 	if (falling == true && velocity.y < maxVerticalVelocity)
@@ -219,6 +260,7 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 	playerShape.setOrigin(origin);
 	//std::cout << "x: " << velocity.x << " y: " << velocity.y << std::endl;
 	lastPosition.push_front(sf::Vector2f(playerShape.getPosition().x, playerShape.getPosition().y));
+
 	if (lastPosition.size() > 50)
 	{
 		lastPosition.pop_back();

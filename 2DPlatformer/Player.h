@@ -36,6 +36,8 @@ public:
 	std::vector<sf::Vector2i> rightTiles;
 	std::vector<sf::Vector2i> topTiles;
 
+	bool resetPosition;
+
 
 	float time;
 
