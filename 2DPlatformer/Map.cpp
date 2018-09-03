@@ -495,7 +495,6 @@ const int * Map::ReturnMap()
 	return *levelArray;
 }
 
-
 bool Map::checkIfAdjancentSquares(sf::Vector2i currentSpace, sf::Vector2i nextSpace, std::vector <sf::Vector2i> previousSpaces)
 {
 	//Set the current space to 2 so we know which space is the only one that should already have a value

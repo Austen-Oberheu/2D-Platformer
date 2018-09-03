@@ -4,6 +4,7 @@
 
 Player::Player(sf::Sprite &playerShape, sf::Vector2f playerStart)
 {
+
 	playerShape.setPosition(playerStart.x, playerStart.y);
 	playerShape.setScale(.2f, .2f);
 
@@ -15,12 +16,9 @@ Player::Player(sf::Sprite &playerShape, sf::Vector2f playerStart)
 	maxVerticalVelocity = 1000;
 	minVerticalVelocity = -1500;
 
-
-	
 	allowedToJump = false;
 	walkingRight = true;
 	time = 0.f;
-
 }
 
 
@@ -28,8 +26,9 @@ Player::~Player()
 {
 }
 
-void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][100], /*std::vector<sf::RectangleShape>& blockBoundingBox,*/ sf::Vector2f origin, sf::Vertex ($bottomLine)[3][2], sf::Vertex ($rightLine)[3][2], sf::Vertex ($leftLine)[3][2], sf::Vertex ($upLine)[3][2], bool &jumpVariable)
+void Player::Update(sf::Sprite &playerShape, float deltaTime, const int (&map)[100][100], /*std::vector<sf::RectangleShape>& blockBoundingBox,*/ sf::Vector2f origin, sf::Vertex ($bottomLine)[3][2], sf::Vertex ($rightLine)[3][2], sf::Vertex ($leftLine)[3][2], sf::Vertex ($upLine)[3][2])
 {
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && !sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 		if (velocity.x < maxHorizontalVelocity)
@@ -52,50 +51,68 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 		
 	}
 
-	
+	//Added second if statement to allow for shorter jumps if space is not held for full jump
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
-		if (allowedToJump == true)
+		if (allowedToJump == true && velocity.y > -1000)
 		{
-			velocity.y -= 1500;
-			allowedToJump = false;
+			velocity.y -= 200;
 			allowedToDoubleJump = true;
 			jumping = true;
 			falling = true;
 			bottomCollision = false;
+			pressedSpaceKey = true;
+			releasedSpaceKey = false;
 			clock.restart();
 		}
+		else if (allowedToJump == true) 
+		{
+			allowedToJump = false;
+		}
+	}
+	else if(pressedSpaceKey == true)
+	{
+		pressedSpaceKey = false;
+		releasedSpaceKey = true;
+		allowedToJump = false;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && allowedToJump == false && clock.getElapsedTime().asMilliseconds() > 250)
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && releasedSpaceKey == true && allowedToJump == false && clock.getElapsedTime().asMilliseconds() > 250)
 	{
 		if (allowedToDoubleJump == true)
 		{
 			velocity.y = 0;
-			velocity.y -= 1500;
+			velocity.y -= 1250;
 			allowedToJump = false;
 			allowedToDoubleJump = false;
 			jumping = true;
 			falling = true;
 			releasedSpaceKey = false;
+			pressedSpaceKey = true;
+			clock.restart();
 		}
 	}
 
-
-	
-	/*if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && wallSliding == true)
 	{
-		if (falling == false && velocity.y >= minHorizontalVelocity || jumping == false)
+		velocity.y = 0;
+		velocity.y -= 1250;
+		if (wallSlidingLeft == true)
 		{
-			allowedToJump = false;
-			falling = true;
+			velocity.x += 500;
 		}
-		if (falling == false && jumping == true && velocity.y < minHorizontalVelocity)
+		else
 		{
-			allowedToJump = false;
-			falling = true;
+			velocity.x -= 500;
 		}
-	}*/
+		allowedToJump = false;
+		allowedToDoubleJump = true;
+		jumping = true;
+		falling = true;
+		releasedSpaceKey = false;
+		pressedSpaceKey = true;
+	}
+
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::A) && (!sf::Keyboard::isKeyPressed(sf::Keyboard::D)))
 	{
 		walking = false;
@@ -216,11 +233,19 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 			playerShape.setPosition(lastPosition.front().x, playerShape.getPosition().y);
 			lastPosition.pop_front();
 			resetPosition = true;
-			velocity.x = 0;
-			allowedToJump = true;
+			//velocity.x = 0;
+			if (falling == true)
+			{
+				wallSliding = true;
+				wallSlidingRight = true;
+			}
 			break;
 		}
-
+		else
+		{
+			wallSliding = false;
+			wallSlidingRight = false;
+		}
 	}
 
 	for (int i = 0; i < leftTiles.size(); i++)
@@ -230,11 +255,20 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 			playerShape.setPosition(lastPosition.front().x, playerShape.getPosition().y);
 			lastPosition.pop_front();
 			resetPosition = true;
-			velocity.x = 0;
-			allowedToJump = true;
+			//velocity.x = 0;
+
+			if (falling == true)
+			{
+				wallSliding = true;
+				wallSlidingLeft = true;
+			}
 			break;
 		}
-
+		else if(wallSlidingRight == false)
+		{
+			wallSliding = false;
+			wallSlidingLeft = false;
+		}
 	}
 
 
@@ -254,11 +288,12 @@ void Player::Update(sf::Sprite &playerShape, float deltaTime, int (&map)[100][10
 		velocity.y += 50;
 	}
 
-	jumpVariable = allowedToJump;
-
+	if (wallSliding == true)
+	{
+		velocity.y = 500;
+	}
 
 	playerShape.setOrigin(origin);
-	//std::cout << "x: " << velocity.x << " y: " << velocity.y << std::endl;
 	lastPosition.push_front(sf::Vector2f(playerShape.getPosition().x, playerShape.getPosition().y));
 
 	if (lastPosition.size() > 50)
@@ -273,7 +308,7 @@ sf::Sprite Player::playerSpriteUpdate(sf::Sprite &playerSprite, std::vector<sf::
 {
 	time += deltaTime;
 
-	if ((time / deltaTime) > 10) 
+	if ((time / deltaTime) > 5) 
 	{
 		
 		if (jumping == true)
@@ -353,3 +388,4 @@ void Player::textureInit(std::vector<sf::Texture> &idleAnimation, std::vector <s
 	jumpingAnimation[8].loadFromFile("Textures/Jump__008.png");
 	jumpingAnimation[9].loadFromFile("Textures/Jump__009.png");
 }
+
